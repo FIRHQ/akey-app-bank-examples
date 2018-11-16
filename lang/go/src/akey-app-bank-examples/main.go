@@ -327,10 +327,19 @@ func main() {
 		log.Println("==generate key finished")
 		log.Println(keyTsv)
 	}
+	/*
+	bindTsv, err := clientTsv.BindKey(context.Background(),&pb_tsv.BindKeyRequest{Key:"AVZJM4LWCCTXSACW",ProviderName:"akey.io",VerifyCode:"479923",Label:appUser1.AppUserId})
+	if err != nil{
+		log.Fatal("generate key error:%v",err)
+	}else{
+		log.Println("==bind key finished")
+		log.Println(bindTsv)
+	}
+	*/
 	// bind 2step key at user device
     // then sendTx with 2step verify code
     // change code to real code
-    userSendTx1 := &pb_user.AppUserTx{Code:"abc",SessionId:session.SessionId}
+    userSendTx1 := &pb_user.AppUserTx{Code:"898277",SessionId:session.SessionId}
 	proto.Merge(userSendTx1,txUser1)
 	log.Println("merged:",userSendTx1)
 
@@ -353,7 +362,7 @@ func main() {
 	}
 	// signData to hex
 	hexSignUserSendTx1 := hex.EncodeToString(signDataUserSendTx1)
-	log.Println(hexSignUserTx1)
+	log.Println(hexSignUserSendTx1)
 	mdSignUserSendTx1 := metadata.Pairs("sign", hexSignUserSendTx1)
 	ctxUserSendSignTx1 := metadata.NewOutgoingContext(context.Background(), mdSignUserSendTx1)
 	// create tx
