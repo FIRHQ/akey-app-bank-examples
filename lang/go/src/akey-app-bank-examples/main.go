@@ -257,7 +257,7 @@ func main() {
 		log.Println(signDataTx1)
 	}
 	// signData to hex
-	hexSignTx1 := hex.EncodeToString(signData)
+	hexSignTx1 := hex.EncodeToString(signDataTx1)
 	log.Println(hexSignTx1)
 	mdSignTx1 := metadata.Pairs("sign", hexSignTx1)
 	ctxSignTx1 := metadata.NewOutgoingContext(context.Background(), mdSignTx1)
@@ -268,4 +268,45 @@ func main() {
 	}else{
 		log.Println(tx1)
 	}
+
+	// send coin from one user to another user,before send,user need bind 2step verify
+	// get user currency
+	var user1BwcCurrency *pb_user.AppUserCurrency
+	user1Currencies := balanceUser1.GetAppUserCurrencies()
+	for i := 0; i < len(user1Currencies); i++ {
+		if bankCurrencies[i].CoinType=="BWC" {
+			user1BwcCurrency = user1Currencies[i]
+			break
+		}
+	}
+	userTx1 := &pb_user.AppUserTx{SessionId:session.SessionId,AppId:session.AppId,CryptoType:"RSA",Amount:"10",FromUserCurrencyId:user1BwcCurrency.Id,ToUserId:appUser2.AppUserId,FromUserId:appUser1.AppUserId}
+	// marshal tx
+	userTx1Buff, err := proto.Marshal(userTx1)
+	if err != nil{
+		log.Fatal("get tx1 buff error:%v",err)
+	}else{
+		log.Println(string(userTx1Buff))
+	}
+	// sign tx
+	hashUserTx1 := sha1.New()
+	hashUserTx1.Write(userTx1Buff)
+	signDataUserTx1, err := rsa.SignPKCS1v15(rand.Reader, user1Sk, crypto.SHA1, hashUserTx1.Sum(nil))
+	if err != nil{
+		log.Fatal("sign user tx  error:%v",err)
+	}else{
+		log.Println(signDataUserTx1)
+	}
+	// signData to hex
+	hexSignUserTx1 := hex.EncodeToString(signDataUserTx1)
+	log.Println(hexSignUserTx1)
+	mdSignUserTx1 := metadata.Pairs("sign", hexSignUserTx1)
+	ctxUserSignTx1 := metadata.NewOutgoingContext(context.Background(), mdSignUserTx1)
+	// create tx
+	txUser1, err := clientUser.CreateTx(ctxUserSignTx1,userTx1)
+	if err != nil{
+		log.Fatal("create tx error:%v",err)
+	}else{
+		log.Println(txUser1)
+	}
+    // then sendTx with 2step verify code
 }
