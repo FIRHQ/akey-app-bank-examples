@@ -1,0 +1,84 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "global.proto";
+option java_multiple_files = true;
+option java_package = "com.akey.open.service.grpc.tsv";
+option java_outer_classname = "TwoStepVerifyProto";
+option objc_class_prefix = "AKey";
+option go_package = "akey-app-bank-examples/grpc/tsv/tsv";
+
+package tsv;
+
+message QRRequest {
+    string provider_name = 1;
+}
+message Provider {
+    string id = 1;
+    string name = 2;
+    string qr_pattern = 3;
+    string logo_url = 4;
+    string verify_api = 5;
+    bool is_akey = 6;
+}
+
+message KeyRequest {
+    string session_id = 1;
+    string label = 2;
+}
+message KeyResponse {
+    string key = 1;
+    string provider_name = 2;
+    string qr_url = 3;
+    string label = 4;
+    string bind_api = 5;
+}
+message BindKeyRequest{
+    string key = 1;
+    string provider_name = 2;
+    string verify_code = 3;
+    string label = 4;
+    string platform = 5;
+    string device_id = 6;
+}
+message TwoStepVerifyStauts{
+    string code = 1;
+    string message = 2;
+}
+
+message VerifyCodeRequest{
+    string code = 1;
+    string session_id = 2;
+    string label = 3;
+}
+
+service TSVService {
+    // service version
+    rpc versionInfo (google.protobuf.Empty) returns (VersionInfo){
+    }
+    /*
+     * get provider from provider name
+     * 
+     */
+    rpc getProvider (QRRequest) returns (Provider) {
+    }
+
+    /*
+     * when provider's key store is akey open platform, provider can generate and bind key , user and device.
+     *
+     */
+    rpc generateKey(KeyRequest) returns (KeyResponse){
+    }
+
+    /*
+     * bind key
+     */
+    rpc bindKey(BindKeyRequest) returns (TwoStepVerifyStauts){
+    }
+
+    /*
+     *verify code, when code resource is akey open platform
+     */
+    rpc verifyCode (VerifyCodeRequest) returns (TwoStepVerifyStauts) {
+
+    }
+}

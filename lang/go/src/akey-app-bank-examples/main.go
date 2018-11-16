@@ -3,8 +3,8 @@ package main
 import (
 	pb_developer "akey-app-bank-examples/grpc/app-bank/developer"
 	pb_user "akey-app-bank-examples/grpc/app-bank/user"
+	pb_tsv "akey-app-bank-examples/grpc/tsv/tsv"
 	"bytes"
-	"errors"
 	"context"
 	"crypto"
 	"crypto/aes"
@@ -15,6 +15,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
+	"errors"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -24,6 +25,7 @@ import (
 
 const (
 	address_app_bank     = "open-api.akeywallet.com:80"
+	address_tsv = "open-api-2sv.akeywallet.com:80"
 )
 
 func padding(src []byte,blocksize int) []byte {
@@ -111,6 +113,13 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
+
+	connTsv, err := grpc.Dial(address_tsv, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect tsv: %v", err)
+	}
+	defer connTsv.Close()
+
 	clientDeveloper := pb_developer.NewDeveloperServiceClient(conn)
 	// init session,get access key from your web console,CtyptoType select RSA or CURVE,curve25519 is a advanced cryto method
     session, err := clientDeveloper.InitSession(context.Background(),&pb_developer.SessionRequest{AccessKey: accessKey, CryptoType: "RSA"})
@@ -304,9 +313,54 @@ func main() {
 	// create tx
 	txUser1, err := clientUser.CreateTx(ctxUserSignTx1,userTx1)
 	if err != nil{
-		log.Fatal("create tx error:%v",err)
+		log.Fatal("create tx error:",err)
 	}else{
 		log.Println(txUser1)
 	}
+
+	// bind 2step verify
+	clientTsv := pb_tsv.NewTSVServiceClient(connTsv)
+	keyTsv, err := clientTsv.GenerateKey(context.Background(),&pb_tsv.KeyRequest{SessionId:session.SessionId,Label:appUser1.AppUserId})
+	if err != nil{
+		log.Fatal("generate key error:%v",err)
+	}else{
+		log.Println("==generate key finished")
+		log.Println(keyTsv)
+	}
+	// bind 2step key at user device
     // then sendTx with 2step verify code
+    // change code to real code
+    userSendTx1 := &pb_user.AppUserTx{Code:"abc",SessionId:session.SessionId}
+	proto.Merge(userSendTx1,txUser1)
+	log.Println("merged:",userSendTx1)
+
+
+	// marshal tx
+	userSendTx1Buff, err := proto.Marshal(userSendTx1)
+	if err != nil{
+		log.Fatal("get tx1 buff error:%v",err)
+	}else{
+		log.Println(string(userSendTx1Buff))
+	}
+	// sign tx
+	hashUserSendTx1 := sha1.New()
+	hashUserSendTx1.Write(userSendTx1Buff)
+	signDataUserSendTx1, err := rsa.SignPKCS1v15(rand.Reader, user1Sk, crypto.SHA1, hashUserSendTx1.Sum(nil))
+	if err != nil{
+		log.Fatal("sign user tx  error:%v",err)
+	}else{
+		log.Println(signDataUserSendTx1)
+	}
+	// signData to hex
+	hexSignUserSendTx1 := hex.EncodeToString(signDataUserSendTx1)
+	log.Println(hexSignUserTx1)
+	mdSignUserSendTx1 := metadata.Pairs("sign", hexSignUserSendTx1)
+	ctxUserSendSignTx1 := metadata.NewOutgoingContext(context.Background(), mdSignUserSendTx1)
+	// create tx
+	txUserSend1, err := clientUser.SendTx(ctxUserSendSignTx1,userSendTx1)
+	if err != nil{
+		log.Fatal("create tx error:",err)
+	}else{
+		log.Println(txUserSend1)
+	}
 }
