@@ -1,0 +1,14 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option java_multiple_files = true;
+option java_package = "com.akey.open.base.grpc.global";
+option java_outer_classname = "GlobalProto";
+option go_package = "akey-app-bank-examples/grpc/global";
+option objc_class_prefix = "AKey";
+
+message VersionInfo {
+    string version = 1;
+    string service = 2;
+    string description = 3;
+    string access_right = 4;
+}

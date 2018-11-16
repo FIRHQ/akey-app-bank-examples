@@ -1,0 +1,132 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option java_multiple_files = true;
+option java_package = "com.akey.api.appbank.grpc.developer";
+option java_outer_classname = "DeveloperProto";
+option go_package = "akey-app-bank-examples/grpc/app-bank/developer";
+option objc_class_prefix = "AKey";
+
+package developer;
+
+message Developer {
+    string id = 1;
+    string user_id = 2;
+    string mobile = 3;
+    string email = 4;
+    string id_card_number = 5;
+    string real_name = 6;
+    string private_key = 7;
+    string public_key = 8;
+    string access_key = 9;
+    uint64 create_at = 10;
+    uint64 update_at = 11;
+    bool active = 12;
+    bool verified = 13;
+}
+
+message Session {
+    string session_id = 1;
+    string developer_id = 2;
+    string secret_key = 3;
+    string app_id = 4;
+    string crypto_type = 5;
+}
+
+message SessionRequest {
+    string access_key = 1;
+    string crypto_type = 2;
+}
+
+message AppBank {
+    string id = 1;
+    string developer_id = 2;
+}
+
+message AppBankCurrency {
+    string id = 1;
+    string bank_id = 2;
+    string coin_type = 3;
+    string balance = 4;
+    string main_net = 5;
+    double gas_rate = 6;
+    uint32 gas = 7;
+    string address_balance = 8;
+    string address = 9;
+    uint32 decimals = 10;
+    string crypto_type = 11;
+}
+
+message AllocateGas {
+    string id = 1;
+    string main_net = 2;
+    string gas_type = 3;
+    uint32 decimal = 4;
+    string session_id = 5;
+}
+
+message UnAllocateGas {
+    string id = 1;
+    string main_net = 2;
+    string gas_type = 3;
+    uint32 decimal = 4;
+    string session_id = 5;
+}
+
+message AppBankBalance {
+    repeated AppBankCurrency bank_currencies = 1;
+}
+
+message BankTx {
+    string id = 1;
+    string bank_id = 2;
+    string tx_type = 3;
+    string app_id = 4;
+    string app_user_id = 5;
+    string coin_type = 6;
+    string amount = 7;
+    string main_net = 8;
+    uint64 trade_at = 9;
+    string session_id = 10;
+    string currency_id = 11;
+    uint32 decimals = 12;
+    uint32 tx_status = 13;
+    string crypto_type = 14;
+}
+
+message BankAddress {
+    string id = 1;
+    string address = 2;
+    string owner = 3;
+    string private_key = 4;
+    string main_net = 5;
+}
+
+service DeveloperService {
+    // developer init session
+    rpc initSession (SessionRequest) returns (Session) {
+    }
+    // get currencies
+    rpc getBalance (Session) returns (AppBankBalance) {
+    }
+    // allocate gas
+    rpc allocateGas (AllocateGas) returns (AllocateGas) {
+    }
+    // unallocate gas
+    rpc unallocateGas (UnAllocateGas) returns (UnAllocateGas) {
+    }
+    // create bank tx
+    rpc createBankTx (BankTx) returns (BankTx) {
+    }
+    // send coin from bank
+    rpc sendTxFromBank (BankTx) returns (BankTx) {
+    }
+    // create bank currency address
+    rpc createBankAddress (BankAddress) returns (BankAddress) {
+    }
+    // create bank
+    rpc createBank (AppBank) returns (AppBank) {
+    }
+    // create bank currency
+    rpc createBankCurrency (AppBankCurrency) returns (AppBankCurrency) {
+    }
+}

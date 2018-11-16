@@ -1,0 +1,98 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "com.akey.api.appbank.grpc.user";
+option java_outer_classname = "UserProto";
+option go_package = "akey-app-bank-examples/grpc/app-bank/user";
+option objc_class_prefix = "AKey";
+
+package app.user;
+
+message AppUser {
+    string id = 1;
+    string app_id = 2;
+    string session_id = 3;
+    string secret_private_key = 4;
+    string secret_public_key = 5;
+    string nonce = 6;
+    string app_user_id = 7;
+    string crypto_type = 8;
+}
+
+message AppUserCurrency {
+    string id = 1;
+    string sys_user_id = 2;
+    string bank_id = 3;
+    string coin_type = 4;
+    string main_net = 5;
+    string balance = 6;
+    string address_balance = 7;
+    string address = 8;
+    uint32 decimals = 9;
+}
+
+message AppUserTx {
+    string id = 1;
+    string app_id = 2;
+    string from_user_id = 3;
+    string to_user_id = 4;
+    string from_user_currency_id = 5;
+    string amount = 6;
+    string bank_id = 7;
+    uint64 fee = 8;
+    string coin_type = 9;
+    string address = 10;
+    string main_net = 11;
+    uint64 trade_at = 12;
+    string session_id = 13;
+    uint32 decimals = 14;
+    uint32 tx_status = 15;
+    string code = 16;
+    string crypto_type = 17;
+}
+
+message AppUserBalance {
+    string app_user_id = 1;
+    string app_id = 2;
+    repeated AppUserCurrency appUserCurrencies = 3;
+    //repeated LockCoin locks = 4;
+}
+
+message AppUserWithdraw {
+    string id = 1;
+    string addr = 2;
+    string currency_id = 3;
+    string amount = 4;
+    string tx_id = 5;
+    string app_user_id = 6;
+    string crypto_type = 7;
+}
+
+message UserAddress {
+    string id = 1;
+    string address = 2;
+    string owner = 3;
+    string main_net = 4;
+    string crypto_type = 5;
+}
+
+
+service AppUserService {
+    // sign in user
+    rpc signInAppUser (AppUser) returns (AppUser) {
+    }
+    // create tx
+    rpc createTx (AppUserTx) returns (AppUserTx) {
+    }
+    // send coin
+    rpc sendTx (AppUserTx) returns (AppUserTx) {
+    }
+    // get balances
+    rpc getBalance (AppUser) returns (AppUserBalance) {
+    }
+    // withdraw
+    rpc withdraw (AppUserWithdraw) returns (AppUserWithdraw) {
+    }
+    // create user currency address
+    rpc createUserAddress (UserAddress) returns (UserAddress) {
+    }
+}
