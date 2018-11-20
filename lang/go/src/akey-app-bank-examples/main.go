@@ -3,7 +3,7 @@ package main
 import (
 	pb_developer "akey-app-bank-examples/grpc/app-bank/developer"
 	pb_user "akey-app-bank-examples/grpc/app-bank/user"
-	pb_tsv "akey-app-bank-examples/grpc/tsv/tsv"
+	//pb_tsv "akey-app-bank-examples/grpc/tsv/tsv"
 	"bytes"
 	"context"
 	"crypto"
@@ -138,7 +138,7 @@ func main() {
 	if err!= nil {
 		log.Fatal("save secret key err:%v",err)
 	}else{
-		log.Println("aes key:",secretKey)
+		log.Println("aes key:",hex.EncodeToString(secretKey))
 	}
 
     // get balance from your bank, need sign protobuf
@@ -147,7 +147,7 @@ func main() {
 	if err != nil{
 		log.Fatal("get session buff error:%v",err)
 	}else{
-		log.Println(string(sessionBuff))
+		log.Println("session buff:",string(sessionBuff))
 	}
 	// sign session
 	hash := sha1.New()
@@ -156,7 +156,7 @@ func main() {
 	if err != nil{
 		log.Fatal("get session buff error:%v",err)
 	}else{
-		log.Println(signData)
+		log.Println("signed session:",signData)
 	}
     // signData to hex
 	hexSign := hex.EncodeToString(signData)
@@ -171,7 +171,7 @@ func main() {
 	}
     // then send currency to your address
 
-    // sign a user to your app
+    // sign  users to your app
     clientUser := pb_user.NewAppUserServiceClient(conn)
 
 	// CtyptoType select RSA or CURVE
@@ -200,8 +200,9 @@ func main() {
 	}
 
 	user1SkBuff := decryptAES(user1SkSecretBuff,secretKey)
+	log.Println("user1 sk is:", string(user1SkBuff))
 	// get user1 balances
-	user1 := &pb_user.AppUser{AppId:session.AppId,AppUserId:appUser1.AppUserId,CryptoType:"RSA"}
+	user1 := &pb_user.AppUser{SessionId:session.SessionId,AppUserId:appUser1.AppUserId,CryptoType:"RSA"}
 
 	// marshal session
 	user1Buff, err := proto.Marshal(user1)
@@ -248,7 +249,7 @@ func main() {
 		}
 	}
 	// send bank tx
-	bankTx1 := &pb_developer.BankTx{SessionId:session.SessionId,TxType:"out",AppId:session.AppId,AppUserId:appUser1.AppUserId,CoinType:balanceBWC.CoinType,MainNet:balanceBWC.MainNet,CurrencyId:balanceBWC.Id,CryptoType:"RSA",Amount:"100"}
+	bankTx1 := &pb_developer.BankTx{SessionId:session.SessionId,TxType:"out",AppUserId:appUser1.AppUserId,CoinType:balanceBWC.CoinType,MainNet:balanceBWC.MainNet,CurrencyId:balanceBWC.Id,CryptoType:"RSA",Amount:"100"}
 	// marshal tx
 	tx1Buff, err := proto.Marshal(bankTx1)
 	if err != nil{
@@ -280,15 +281,26 @@ func main() {
 
 	// send coin from one user to another user,before send,user need bind 2step verify
 	// get user currency
+	balanceUser11, err := clientUser.GetBalance(ctxUser1,user1)
+	if err != nil{
+		log.Fatal("get user balance error:%v",err)
+	}else{
+		log.Println("user1 currency is:",balanceUser11)
+	}
 	var user1BwcCurrency *pb_user.AppUserCurrency
-	user1Currencies := balanceUser1.GetAppUserCurrencies()
-	for i := 0; i < len(user1Currencies); i++ {
+	user11Currencies := balanceUser11.GetAppUserCurrencies()
+	for i := 0; i < len(user11Currencies); i++ {
 		if bankCurrencies[i].CoinType=="BWC" {
-			user1BwcCurrency = user1Currencies[i]
+			user1BwcCurrency = user11Currencies[i]
 			break
 		}
 	}
-	userTx1 := &pb_user.AppUserTx{SessionId:session.SessionId,AppId:session.AppId,CryptoType:"RSA",Amount:"10",FromUserCurrencyId:user1BwcCurrency.Id,ToUserId:appUser2.AppUserId,FromUserId:appUser1.AppUserId}
+
+	log.Println("from user currency id is:",user1BwcCurrency)
+	userTx1 := &pb_user.AppUserTx{AppId:session.AppId,CryptoType:"RSA",Amount:"10",FromUserCurrencyId:user1BwcCurrency.Id,ToUserId:appUser2.AppUserId}
+
+	log.Println("userTx1 is",userTx1)
+
 	// marshal tx
 	userTx1Buff, err := proto.Marshal(userTx1)
 	if err != nil{
@@ -317,32 +329,32 @@ func main() {
 	}else{
 		log.Println(txUser1)
 	}
-
-	// bind 2step verify
-	clientTsv := pb_tsv.NewTSVServiceClient(connTsv)
-	keyTsv, err := clientTsv.GenerateKey(context.Background(),&pb_tsv.KeyRequest{SessionId:session.SessionId,Label:appUser1.AppUserId})
-	if err != nil{
-		log.Fatal("generate key error:%v",err)
-	}else{
-		log.Println("==generate key finished")
-		log.Println(keyTsv)
-	}
 	/*
-	bindTsv, err := clientTsv.BindKey(context.Background(),&pb_tsv.BindKeyRequest{Key:"AVZJM4LWCCTXSACW",ProviderName:"akey.io",VerifyCode:"479923",Label:appUser1.AppUserId})
-	if err != nil{
-		log.Fatal("generate key error:%v",err)
-	}else{
-		log.Println("==bind key finished")
-		log.Println(bindTsv)
-	}
+		// bind 2step verify
+		clientTsv := pb_tsv.NewTSVServiceClient(connTsv)
+		keyTsv, err := clientTsv.GenerateKey(context.Background(),&pb_tsv.KeyRequest{SessionId:session.SessionId,Label:appUser1.AppUserId})
+		if err != nil{
+			log.Fatal("generate key error:%v",err)
+		}else{
+			log.Println("==generate key finished")
+			log.Println(keyTsv)
+		}
+
+		bindTsv, err := clientTsv.BindKey(context.Background(),&pb_tsv.BindKeyRequest{Key:"EH7EBYJFRNVPJLYW",ProviderName:"akey.io",VerifyCode:"191651",Label:appUser1.AppUserId})
+		if err != nil{
+			log.Fatal("generate key error:%v",err)
+		}else{
+			log.Println("==bind key finished")
+			log.Println(bindTsv)
+		}
 	*/
 	// bind 2step key at user device
     // then sendTx with 2step verify code
     // change code to real code
-    userSendTx1 := &pb_user.AppUserTx{Code:"898277",SessionId:session.SessionId}
+/*
+    userSendTx1 := &pb_user.AppUserTx{Code:"325268",SessionId:session.SessionId}
 	proto.Merge(userSendTx1,txUser1)
 	log.Println("merged:",userSendTx1)
-
 
 	// marshal tx
 	userSendTx1Buff, err := proto.Marshal(userSendTx1)
@@ -372,4 +384,5 @@ func main() {
 	}else{
 		log.Println(txUserSend1)
 	}
+*/
 }
