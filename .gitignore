@@ -1,8 +1,10 @@
 out
 build/
+.vs/
 .idea/
 .gradle/
 gradle/
+obj/
 *.class
 *.log
 *.iml
