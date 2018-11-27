@@ -19,4 +19,12 @@
   <ItemGroup>
     <Folder Include="Crypto\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Tsv\Tsv.cs" />
+    <Compile Remove="User\User.cs" />
+    <Compile Remove="User\UserGrpc.cs" />
+    <Compile Remove="Developer\Developer.cs" />
+    <Compile Remove="Developer\DeveloperGrpc.cs" />
+    <Compile Remove="Global\Global.cs" />
+  </ItemGroup>
 </Project>
