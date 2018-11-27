@@ -16,22 +16,10 @@ module Developer
 
       # developer init session
       rpc :initSession, SessionRequest, Session
-      # get currencies
+      # get balance
       rpc :getBalance, Session, AppBankBalance
-      # allocate gas
-      rpc :allocateGas, AllocateGas, AllocateGas
-      # unallocate gas
-      rpc :unallocateGas, UnAllocateGas, UnAllocateGas
-      # create bank tx
-      rpc :createBankTx, BankTx, BankTx
       # send coin from bank
       rpc :sendTxFromBank, BankTx, BankTx
-      # create bank currency address
-      rpc :createBankAddress, BankAddress, BankAddress
-      # create bank
-      rpc :createBank, AppBank, AppBank
-      # create bank currency
-      rpc :createBankCurrency, AppBankCurrency, AppBankCurrency
     end
 
     Stub = Service.rpc_stub_class

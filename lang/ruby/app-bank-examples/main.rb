@@ -101,8 +101,8 @@ def main
   # get user1 balances
   user1_balance = stub_user.get_balance(app_user1,{metadata:{sign:signed_user1}})
   p "user1 balance: #{user1_balance.app_user_id}"
-  p "user1 balance: #{user1_balance.app_user_currencies[0].balance}"
-  p "user1 balance: #{user1_balance.app_user_currencies[0].coin_type}"
+  p "user1 balance: #{user1_balance.appUserCurrencies[0].balance}"
+  p "user1 balance: #{user1_balance.appUserCurrencies[0].coin_type}"
 
   # find a bank currency
   bwc = nil
@@ -134,10 +134,10 @@ def main
   # get user1 balance
   user1_balance = stub_user.get_balance(app_user1,{metadata:{sign:signed_user1}})
   p "user1 balance: #{user1_balance.app_user_id}"
-  p "user1 balance: #{user1_balance.app_user_currencies[0].balance}"
-  p "user1 balance: #{user1_balance.app_user_currencies[0].coin_type}"
+  p "user1 balance: #{user1_balance.appUserCurrencies[0].balance}"
+  p "user1 balance: #{user1_balance.appUserCurrencies[0].coin_type}"
   user1_bwc = nil
-  user1_balance.app_user_currencies.each do | c |
+  user1_balance.appUserCurrencies.each do | c |
       if c.coin_type == "BWC"
           user1_bwc = c
           break

@@ -3,7 +3,6 @@ import "google/protobuf/empty.proto";
 option java_multiple_files = true;
 option java_package = "com.akey.api.appbank.grpc.developer";
 option java_outer_classname = "DeveloperProto";
-option go_package = "akey-app-bank-examples/grpc/app-bank/developer";
 option objc_class_prefix = "AKey";
 
 package developer;
@@ -40,6 +39,7 @@ message SessionRequest {
 message AppBank {
     string id = 1;
     string developer_id = 2;
+    string crypto_type = 3;
 }
 
 message AppBankCurrency {
@@ -99,34 +99,17 @@ message BankAddress {
     string owner = 3;
     string private_key = 4;
     string main_net = 5;
+    string crypto_type = 6;
 }
 
 service DeveloperService {
     // developer init session
     rpc initSession (SessionRequest) returns (Session) {
     }
-    // get currencies
+    // get balance
     rpc getBalance (Session) returns (AppBankBalance) {
-    }
-    // allocate gas
-    rpc allocateGas (AllocateGas) returns (AllocateGas) {
-    }
-    // unallocate gas
-    rpc unallocateGas (UnAllocateGas) returns (UnAllocateGas) {
-    }
-    // create bank tx
-    rpc createBankTx (BankTx) returns (BankTx) {
     }
     // send coin from bank
     rpc sendTxFromBank (BankTx) returns (BankTx) {
-    }
-    // create bank currency address
-    rpc createBankAddress (BankAddress) returns (BankAddress) {
-    }
-    // create bank
-    rpc createBank (AppBank) returns (AppBank) {
-    }
-    // create bank currency
-    rpc createBankCurrency (AppBankCurrency) returns (AppBankCurrency) {
     }
 }

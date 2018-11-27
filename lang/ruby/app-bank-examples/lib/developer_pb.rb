@@ -34,6 +34,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "developer.AppBank" do
     optional :id, :string, 1
     optional :developer_id, :string, 2
+    optional :crypto_type, :string, 3
   end
   add_message "developer.AppBankCurrency" do
     optional :id, :string, 1
@@ -87,6 +88,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :owner, :string, 3
     optional :private_key, :string, 4
     optional :main_net, :string, 5
+    optional :crypto_type, :string, 6
   end
 end
 

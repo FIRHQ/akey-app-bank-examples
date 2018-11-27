@@ -47,7 +47,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "app.user.AppUserBalance" do
     optional :app_user_id, :string, 1
     optional :app_id, :string, 2
-    repeated :app_user_currencies, :message, 3, "app.user.AppUserCurrency"
+    repeated :appUserCurrencies, :message, 3, "app.user.AppUserCurrency"
   end
   add_message "app.user.AppUserWithdraw" do
     optional :id, :string, 1

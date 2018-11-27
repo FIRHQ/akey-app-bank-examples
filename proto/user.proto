@@ -2,7 +2,6 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "com.akey.api.appbank.grpc.user";
 option java_outer_classname = "UserProto";
-option go_package = "akey-app-bank-examples/grpc/app-bank/user";
 option objc_class_prefix = "AKey";
 
 package app.user;
