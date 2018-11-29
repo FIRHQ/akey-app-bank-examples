@@ -4,6 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>app_bank_examples</RootNamespace>
+    <StartupObject>app_bank_examples.Program</StartupObject>
+    <CodePage>65001</CodePage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,5 +28,13 @@
     <Compile Remove="Developer\Developer.cs" />
     <Compile Remove="Developer\DeveloperGrpc.cs" />
     <Compile Remove="Global\Global.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\testpk.pem" />
+    <None Remove="Resources\testsk.pem" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\testpk.pem" />
+    <EmbeddedResource Include="Resources\testsk.pem" />
   </ItemGroup>
 </Project>

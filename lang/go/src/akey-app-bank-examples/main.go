@@ -187,7 +187,7 @@ func main() {
 	}else{
 		log.Println(appUser2)
 	}
-    // docrypt user's pk sk;
+    // decrypt user's pk sk;
 /*
     user1PkSecretBuff,err := hex.DecodeString(appUser1.SecretPublicKey)
     if err != nil{
